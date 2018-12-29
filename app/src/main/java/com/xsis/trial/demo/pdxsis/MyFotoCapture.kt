@@ -1,0 +1,156 @@
+package com.xsis.trial.demo.pdxsis
+
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
+import android.net.Uri
+import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
+import android.support.v4.content.FileProvider
+import android.support.v7.app.AppCompatActivity
+import android.util.Log
+import android.widget.ImageView
+import java.io.File
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.*
+import android.graphics.BitmapFactory
+import android.location.*
+import android.widget.TextView
+
+
+class MyFotoCapture: AppCompatActivity(){
+
+    val REQUEST_IMAGE_CAPTURE = 1
+    val REQUEST_TAKE_PHOTO = 1
+    lateinit var hasilFoto: ImageView
+    lateinit var mCurrentPhotoPath: String
+    lateinit var textCity: TextView
+    lateinit var textState: TextView
+    lateinit var textCountry: TextView
+    lateinit var textPostalCode: TextView
+    lateinit var myLocation: Location
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.foto_capture)
+        textCity = findViewById(R.id.textCity) as TextView
+        textCountry = findViewById(R.id.textCountry) as TextView
+        textState = findViewById(R.id.textState) as TextView
+        textPostalCode = findViewById(R.id.textPostalCode) as TextView
+        myLocation = this!!.getLastKnownLocation()!!
+        hasilFoto = findViewById(R.id.hasilFoto)
+        mCurrentPhotoPath = ""
+        dispatchTakePictureIntent()
+
+        getLocationCode(myLocation.latitude.toDouble(), myLocation.longitude.toDouble())
+
+    }
+
+    private fun dispatchTakePictureIntent() {
+        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+            takePictureIntent.resolveActivity(packageManager)?.also {
+                val photoFile: File? = try {
+                    createImageFile()
+                } catch (ex: IOException) {
+                    // Error occurred while creating the File
+                    null
+                }
+                Log.d("namefile",mCurrentPhotoPath)
+
+                photoFile?.also {
+                    val photoURI: Uri = FileProvider.getUriForFile(
+                        this,
+                        "com.xsis.trial.demo.pdxsis",
+                        it
+                    )
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
+                    //galleryAddPic()
+                }
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            val bmp = BitmapFactory.decodeFile(mCurrentPhotoPath)
+            hasilFoto.setImageBitmap(bmp)
+        }
+    }
+
+    @Throws(IOException::class)
+    private fun createImageFile(): File {
+        // Create an image file name
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val storageDir: File = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(
+            "JPEG_${timeStamp}_", /* prefix */
+            ".jpg", /* suffix */
+            storageDir /* directory */
+        ).apply {
+            // Save a file: path for use with ACTION_VIEW intents
+            mCurrentPhotoPath = absolutePath
+        }
+    }
+
+    //menambahkan ke gallery:
+    private fun galleryAddPic() {
+        Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE).also { mediaScanIntent ->
+            val f = File(mCurrentPhotoPath)
+            mediaScanIntent.data = Uri.fromFile(f)
+            sendBroadcast(mediaScanIntent)
+        }
+    }
+
+    private fun getLocationCode(ltd: Double, lng: Double){
+        val geocoder: Geocoder
+        val addresses: List<Address>
+        geocoder = Geocoder(this, Locale.getDefault())
+
+        addresses = geocoder.getFromLocation(
+            ltd,
+            lng,
+            1
+        ) // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+
+        val address = addresses[0].getAddressLine(0) // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+        val city = addresses[0].getLocality()
+        val state = addresses[0].getAdminArea()
+        val country = addresses[0].getCountryName()
+        val postalCode = addresses[0].getPostalCode()
+        val knownName = addresses[0].getFeatureName()
+
+        textCity.text = ":" + city
+        textPostalCode.text = ":" + postalCode
+        textCountry.text = ":" + country
+        textState.text = ":" + state
+
+        Log.d("mylocation", city)
+        Log.d("mylocation", state)
+        Log.d("mylocation", country)
+        Log.d("mylocation", postalCode)
+
+
+    }
+
+    lateinit var mLocationManager: LocationManager
+   // var myLocation = getLastKnownLocation()
+
+    @SuppressLint("MissingPermission")
+    private fun getLastKnownLocation(): Location? {
+        mLocationManager = applicationContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val providers = mLocationManager.getProviders(true)
+        var bestLocation: Location? = null
+        for (provider in providers) {
+            val l = mLocationManager.getLastKnownLocation(provider) ?: continue
+            if (bestLocation == null || l.accuracy < bestLocation.accuracy) {
+                // Found best last known location: %s", l);
+                bestLocation = l
+            }
+        }
+        return bestLocation
+    }
+}
