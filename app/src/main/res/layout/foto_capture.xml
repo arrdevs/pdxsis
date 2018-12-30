@@ -2,22 +2,23 @@
 <android.support.constraint.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:background="#fff"
         xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
         android:layout_height="match_parent">
 
     <ImageView
-            android:layout_width="249dp"
-            android:layout_height="166dp" tools:srcCompat="@tools:sample/backgrounds/scenic[0]"
-            android:id="@+id/hasilFoto" android:layout_marginTop="24dp"
+            android:layout_width="212dp"
+            android:layout_height="162dp"
+            android:id="@+id/hasilFoto" android:layout_marginTop="16dp"
             app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
             android:layout_marginLeft="8dp" android:layout_marginStart="8dp" app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="8dp" android:layout_marginRight="8dp"
-            android:background="@android:drawable/screen_background_light_transparent"/>
+            android:layout_marginEnd="8dp" android:layout_marginRight="8dp" app:srcCompat="@drawable/ic_menu_camera"/>
     <Button
             android:text="Send Image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/sendImage"
+            android:onClick="sendPhotoFileToServer"
             app:layout_constraintTop_toBottomOf="@+id/hasilFoto" app:layout_constraintStart_toStartOf="parent"
             android:layout_marginLeft="8dp" android:layout_marginStart="8dp" app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="8dp" android:layout_marginRight="8dp"

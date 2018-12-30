@@ -18,10 +18,22 @@ import java.text.SimpleDateFormat
 import java.util.*
 import android.graphics.BitmapFactory
 import android.location.*
+import android.view.ContextMenu
+import android.view.MenuItem
+import android.view.View
 import android.widget.TextView
+import android.widget.Toast
+import com.xsis.trial.demo.pdxsis.com.xsis.trial.demo.pdxsis.serverrequest.RetroRequest
+import com.xsis.trial.demo.pdxsis.entity.ObjectMapDescription
+import com.xsis.trial.demo.pdxsis.presenter.PresenterServerRequest
+import okhttp3.MediaType
+import okhttp3.RequestBody
+import okhttp3.MultipartBody
 
 
-class MyFotoCapture: AppCompatActivity(){
+
+
+class MyFotoCapture: AppCompatActivity(), PresenterServerRequest.ResponseStatus {
 
     val REQUEST_IMAGE_CAPTURE = 1
     val REQUEST_TAKE_PHOTO = 1
@@ -32,6 +44,9 @@ class MyFotoCapture: AppCompatActivity(){
     lateinit var textCountry: TextView
     lateinit var textPostalCode: TextView
     lateinit var myLocation: Location
+    lateinit var mLocationManager: LocationManager
+    lateinit var currentFilePhoto: File
+    lateinit var presenterServerRequest: PresenterServerRequest
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,13 +55,16 @@ class MyFotoCapture: AppCompatActivity(){
         textCountry = findViewById(R.id.textCountry) as TextView
         textState = findViewById(R.id.textState) as TextView
         textPostalCode = findViewById(R.id.textPostalCode) as TextView
+        presenterServerRequest = PresenterServerRequest(this)
+        currentFilePhoto = File("")
         myLocation = this!!.getLastKnownLocation()!!
         hasilFoto = findViewById(R.id.hasilFoto)
         mCurrentPhotoPath = ""
         dispatchTakePictureIntent()
-
         getLocationCode(myLocation.latitude.toDouble(), myLocation.longitude.toDouble())
 
+        //back icon home
+        getSupportActionBar()!!.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun dispatchTakePictureIntent() {
@@ -58,7 +76,8 @@ class MyFotoCapture: AppCompatActivity(){
                     // Error occurred while creating the File
                     null
                 }
-                Log.d("namefile",mCurrentPhotoPath)
+
+                currentFilePhoto = photoFile!!
 
                 photoFile?.also {
                     val photoURI: Uri = FileProvider.getUriForFile(
@@ -67,9 +86,10 @@ class MyFotoCapture: AppCompatActivity(){
                         it
                     )
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
                     //galleryAddPic()
                 }
+
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
             }
         }
     }
@@ -77,7 +97,10 @@ class MyFotoCapture: AppCompatActivity(){
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             val bmp = BitmapFactory.decodeFile(mCurrentPhotoPath)
+            //setPic()
             hasilFoto.setImageBitmap(bmp)
+        } else{
+            onBackPressed()
         }
     }
 
@@ -93,15 +116,6 @@ class MyFotoCapture: AppCompatActivity(){
         ).apply {
             // Save a file: path for use with ACTION_VIEW intents
             mCurrentPhotoPath = absolutePath
-        }
-    }
-
-    //menambahkan ke gallery:
-    private fun galleryAddPic() {
-        Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE).also { mediaScanIntent ->
-            val f = File(mCurrentPhotoPath)
-            mediaScanIntent.data = Uri.fromFile(f)
-            sendBroadcast(mediaScanIntent)
         }
     }
 
@@ -123,21 +137,11 @@ class MyFotoCapture: AppCompatActivity(){
         val postalCode = addresses[0].getPostalCode()
         val knownName = addresses[0].getFeatureName()
 
-        textCity.text = ":" + city
-        textPostalCode.text = ":" + postalCode
-        textCountry.text = ":" + country
-        textState.text = ":" + state
-
-        Log.d("mylocation", city)
-        Log.d("mylocation", state)
-        Log.d("mylocation", country)
-        Log.d("mylocation", postalCode)
-
-
+        textCity.text = city
+        textPostalCode.text = postalCode
+        textCountry.text = country
+        textState.text = state
     }
-
-    lateinit var mLocationManager: LocationManager
-   // var myLocation = getLastKnownLocation()
 
     @SuppressLint("MissingPermission")
     private fun getLastKnownLocation(): Location? {
@@ -153,4 +157,59 @@ class MyFotoCapture: AppCompatActivity(){
         }
         return bestLocation
     }
+
+    fun sendPhotoFileToServer(view: View){
+
+        val imageFile = currentFilePhoto
+        var omd: ObjectMapDescription = ObjectMapDescription(textState.text as String, textCity.text as String, textPostalCode.text as String, textCountry.text as String)
+        val filePart = MultipartBody.Part.createFormData(
+            "file",
+            imageFile.getName(),
+            RequestBody.create(MediaType.parse("image/*"), imageFile)
+        )
+
+        presenterServerRequest.save(filePart, omd)
+
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when(item!!.itemId){
+            android.R.id.home ->{
+                onBackPressed()
+            }
+        }
+
+        return true
+    }
+
+    private fun setPic() {
+        // Get the dimensions of the View
+        val targetW: Int = 128
+        val targetH: Int = 128
+
+        val bmOptions = BitmapFactory.Options().apply {
+            // Get the dimensions of the bitmap
+            inJustDecodeBounds = true
+            BitmapFactory.decodeFile(mCurrentPhotoPath, this)
+            val photoW: Int = outWidth
+            val photoH: Int = outHeight
+
+            // Determine how much to scale down the image
+            val scaleFactor: Int = Math.min(photoW / targetW, photoH / targetH)
+
+            // Decode the image file into a Bitmap sized to fill the View
+            inJustDecodeBounds = false
+            inSampleSize = scaleFactor
+            inPurgeable = true
+        }
+        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions)?.also { bitmap ->
+            hasilFoto.setImageBitmap(bitmap)
+        }
+    }
+
+    override fun responseOk() {
+        Toast.makeText(this, "Photo successfully sent..", Toast.LENGTH_SHORT).show()
+        onBackPressed()
+    }
+
 }
