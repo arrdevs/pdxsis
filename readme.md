@@ -1,4 +1,5 @@
 # Documentasi PD
+* Kotlin Overview
 * Install Requirment
 	* Manifest declarations
 		* Camera Permission 
@@ -10,6 +11,9 @@
 	* Retrofit 2
 * Server Information
  	
+## Kotlin Overview
+Kotlin is a new open source programming language like Java, JavaScript, etc. It is a high level strongly statically typed language that combines functional and technical part in a same place. Currently, Kotlin targets Java and JavaScript. It runs on JVM.
+Kotlin is influenced by other programming languages such as Java, Scala, Groovy, Gosu, etc. The syntax of Kotlin may not be exactly similar to JAVA, however, internally Kotlin is reliant on the existing Java Class library to produce wonderful results for the programmers. Kotlin provides interoperability, code safety, and clarity to the developers around the world.
 ## Install Requirment
 ### Manifest Declaration
 ```xml
