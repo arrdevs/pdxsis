@@ -14,21 +14,21 @@
 ## Kotlin Overview
 Kotlin is a new open source programming language like Java, JavaScript, etc. It is a high level strongly statically typed language that combines functional and technical part in a same place. Currently, Kotlin targets Java and JavaScript. It runs on JVM.
 Kotlin is influenced by other programming languages such as Java, Scala, Groovy, Gosu, etc. The syntax of Kotlin may not be exactly similar to JAVA, however, internally Kotlin is reliant on the existing Java Class library to produce wonderful results for the programmers. Kotlin provides interoperability, code safety, and clarity to the developers around the world.
-Easy Language - Kotlin is a functional language and very easy to learn. The syntax is pretty much similar to Java, hence it is very easy to remember. Kotlin is more expressive, which makes your code more readable and understandable.
+* Easy Language - Kotlin is a functional language and very easy to learn. The syntax is pretty much similar to Java, hence it is very easy to remember. Kotlin is more expressive, which makes your code more readable and understandable.
 
-Concise - Kotlin is based on JVM and it is a functional language. Thus, it reduce lots of boiler plate code used in other programming languages.
+* Concise - Kotlin is based on JVM and it is a functional language. Thus, it reduce lots of boiler plate code used in other programming languages.
 
-Runtime and Performance - Better performance and small runtime.
+* Runtime and Performance - Better performance and small runtime.
 
-Interoperability - Kotlin is mature enough to build an interoperable application in a less complex manner.
+* Interoperability - Kotlin is mature enough to build an interoperable application in a less complex manner.
 
-Brand New - Kotlin is a brand new language that gives developers a fresh start. It is not a replacement of Java, though it is developed over JVM. It is accepted as the first official language of android development. Kotlin can be defined as - Kotlin = JAVA + extra updated new features.
+* Brand New - Kotlin is a brand new language that gives developers a fresh start. It is not a replacement of Java, though it is developed over JVM. It is accepted as the first official language of android development. Kotlin can be defined as - Kotlin = JAVA + extra updated new features.
 
-Following are some of the disadvantages of Kotlin.
+### Following are some of the disadvantages of Kotlin.
 
-Namespace declaration - Kotlin allows developers to declare the functions at the top level. However, whenever the same function is declared in many places of your application, then it is hard to understand which function is being called.
+* Namespace declaration - Kotlin allows developers to declare the functions at the top level. However, whenever the same function is declared in many places of your application, then it is hard to understand which function is being called.
 
-No Static Declaration - Kotlin does not have usual static handling modifier like Java, which can cause some problem to the conventional Java developer.
+* No Static Declaration - Kotlin does not have usual static handling modifier like Java, which can cause some problem to the conventional Java developer.
 ## Install Requirment
 ### Manifest Declaration
 ```xml
