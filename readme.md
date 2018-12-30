@@ -199,4 +199,5 @@ public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file,
 ```
 
 ## Reference 
-	* https://developer.android.com/guide/topics/media/camera
+* [Android Kotlin Topic](https://developer.android.com/guide/topics/media/camera)
+* [Spring Callicoder](https://www.callicoder.com/spring-boot-file-upload-download-rest-api-example/)
