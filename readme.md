@@ -175,8 +175,7 @@ fun save(filePart: MultipartBody.Part?, omd: ObjectMapDescription) {
 
 ## Server Information
 * SpringBoot java framework
-* [ServerApp] (/https://github.com/arrdevs/example-upload-spring-boot.git)
-* [Activity](/activity.md)
+* [ServerApp](https://github.com/arrdevs/example-upload-spring-boot.git)
 * snippet code java retriev data
 ```java
 @PostMapping("/uploadFile")
